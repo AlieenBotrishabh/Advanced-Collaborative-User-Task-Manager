@@ -52,3 +52,36 @@ const registerUser = async(req, res) => {
         })
     }
 }
+
+const loginUser = async() => {
+    const { empid, password } = req.body;
+
+    const user = await task.findOne(empid);
+
+    if(!user)
+    {
+        res.status(400).json({
+            msg : 'User not found Kindly register first'
+        })
+    }
+
+    const isPassword = await bcrypt.compare(password, user.password);
+
+    if(!isPassword)
+    {
+        res.status(400).json({
+            msg : 'Invalid Password'
+        })
+    }
+
+    const accessToken = jwt.sign({
+        empid : user.empid,
+        name : user.name,
+        email : user.email,
+        password : user.password
+    }, process.env.JWT_SECRET_KEY, {
+        expiresIn : '1m'
+    })
+}
+
+module.exports = {registerUser, loginUser};
