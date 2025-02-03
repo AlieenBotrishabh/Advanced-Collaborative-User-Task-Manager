@@ -1,6 +1,14 @@
 const express = require('express');
 
+require('dotenv').config();
+
 const PORT = process.env.PORT || 5000;
+
+const authRoutes = require('./routes/authroutes');
+
+const homeRoutes = require('./routes/homeroutes');
+
+const adminRoutes = require('./routes/adminroutes');
 
 const connectDB = require('./database/database');
 
@@ -9,6 +17,10 @@ const Task = require('./model/model');
 const app = express();
 
 app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/home', homeRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', async(req, res) => {
 

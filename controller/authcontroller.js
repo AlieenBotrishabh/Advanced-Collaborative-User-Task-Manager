@@ -1,6 +1,6 @@
 const Task = require('../model/model');
 const jwt = require('jsonwebtoken');
-const brcypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 const registerUser = async(req, res) => {
 
@@ -26,7 +26,7 @@ const registerUser = async(req, res) => {
         })
     }
 
-    const salt = await brcypt.genSalt(10);
+    const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newlyCreatedUser = new Task({
@@ -53,35 +53,41 @@ const registerUser = async(req, res) => {
     }
 }
 
-const loginUser = async() => {
+const loginUser = async(req, res) => {
     const { empid, password } = req.body;
 
-    const user = await task.findOne(empid);
+    const user = await Task.findOne({ empid });
 
-    if(!user)
-    {
-        res.status(400).json({
-            msg : 'User not found Kindly register first'
-        })
+    if (!user) {
+        return res.status(400).json({
+            msg: 'User not found. Kindly register first.'
+        });
     }
 
     const isPassword = await bcrypt.compare(password, user.password);
 
-    if(!isPassword)
-    {
-        res.status(400).json({
-            msg : 'Invalid Password'
-        })
+    if (!isPassword) {
+        return res.status(400).json({
+            msg: 'Invalid Password'
+        });
     }
 
-    const accessToken = jwt.sign({
-        empid : user.empid,
-        name : user.name,
-        email : user.email,
-        password : user.password
-    }, process.env.JWT_SECRET_KEY, {
-        expiresIn : '1m'
-    })
-}
+    const accessToken = jwt.sign(
+        {
+            userId: user._id,
+            empid: user.empid,
+            name: user.name,
+            email: user.email,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: '1m' }
+    );
 
-module.exports = {registerUser, loginUser};
+    return res.status(200).json({
+        msg: 'User logged in successfully',
+        accessToken
+    });
+};
+
+
+module.exports = { registerUser, loginUser };
