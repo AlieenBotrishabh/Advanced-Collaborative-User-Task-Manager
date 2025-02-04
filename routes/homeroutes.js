@@ -4,7 +4,7 @@ const authMiddleware = require('../middlewares/authmiddleware');
 const router = express.Router();
 
 router.get('/welcome', authMiddleware, (req, res) => {
-    const { empid, name, email, password } = req.userInfo;
+    const { empid, name, email } = req.userInfo;
 
     res.status(200).json({
         msg : 'Home Page',

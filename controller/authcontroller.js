@@ -80,7 +80,7 @@ const loginUser = async(req, res) => {
             email: user.email,
         },
         process.env.JWT_SECRET_KEY,
-        { expiresIn: '1m' }
+        { expiresIn: '1h' }
     );
 
     return res.status(200).json({
