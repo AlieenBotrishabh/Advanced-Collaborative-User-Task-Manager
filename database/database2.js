@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const connectDB = async() => {
     try
     {
-        await mongoose.connect('mongodb://localhost:27017/Taskdb');
+        await mongoose.connect('mongodb://localhost:27017/Task');
         
         console.log('Database Connected Successfully');
     }

@@ -125,10 +125,10 @@ app.put('/user/:id', async(req, res) => {
 })
 
 app.get('/task', async(req, res) => {
-    const task = await Model.find({});
-
     try
     {
+        const task = await Model.find({});
+
         res.status(200).json({
             msg : 'Task found successfully',
             task
@@ -139,6 +139,33 @@ app.get('/task', async(req, res) => {
         res.status(400).json({
             msg : 'Task not found'
         })
+    }
+})
+
+app.post('/task', async(req, res) => {
+    try
+    {
+        const { task, description, priority, deadline } = req.body;
+
+    const Task = await Model.create({
+        task : task,
+        description : description,
+        priority : priority,
+        deadline : deadline
+    })
+
+    res.status(200).json({
+        msg : 'Task created successfully',
+        Task
+    })
+    }
+    catch(err)
+    {
+        res.status(400).json({
+            msg : 'Task not created'
+        })
+
+        console.log(`An error ocurred ${err}`);
     }
 })
 
