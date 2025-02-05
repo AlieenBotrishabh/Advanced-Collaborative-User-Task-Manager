@@ -20,4 +20,4 @@ const schema = new mongoose.Schema({
 
 })
 
-module.exports = mongoose.model('TaskDB', schema);
+module.exports = mongoose.model('Taskdb', schema);

@@ -12,7 +12,11 @@ const adminRoutes = require('./routes/adminroutes');
 
 const connectDB = require('./database/database');
 
+const connectDB2 = require('./database/database2');
+
 const Task = require('./model/model');
+
+const Model = require('./schema/task');
 
 const app = express();
 
@@ -120,7 +124,27 @@ app.put('/user/:id', async(req, res) => {
     }
 })
 
+app.get('/task', async(req, res) => {
+    const task = await Model.find({});
+
+    try
+    {
+        res.status(200).json({
+            msg : 'Task found successfully',
+            task
+        })
+    }
+    catch(err)
+    {
+        res.status(400).json({
+            msg : 'Task not found'
+        })
+    }
+})
+
 connectDB();
+
+connectDB2();
 
 app.listen(PORT, () => {
     console.log(`Server is listening on the port ${PORT}`);
