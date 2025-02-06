@@ -169,6 +169,33 @@ app.post('/task', async(req, res) => {
     }
 })
 
+app.put('/task/:id', async(req, res) => {
+
+    const { id } = req.params;
+
+    const { task, description, priority, deadline } = req.body;
+
+    const createdTask = await Model.findByIdAndUpdate(
+        id,
+        { task, description, priority, deadline },
+        { new : true, runValidators : true }
+    )
+
+    if(!createdTask)
+    {
+        res.status(400).json({
+            msg : 'Task not found'
+        })
+    }
+    else
+    {
+        res.status(200).json({
+            msg : 'Task found successfully',
+            createdTask
+        })
+    }
+})
+
 connectDB();
 
 connectDB2();
