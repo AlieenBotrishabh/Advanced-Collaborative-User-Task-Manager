@@ -1,5 +1,13 @@
 const express = require('express');
 
+const app = express();
+
+const http = require('http');
+
+const server = http.createServer(app);
+
+const { Server } = require('socket.io');
+
 require('dotenv').config();
 
 const PORT = process.env.PORT || 5000;
@@ -20,13 +28,33 @@ const Task = require('./model/model');
 
 const Model = require('./schema/task');
 
-const app = express();
-
 app.use(express.json());
+
+const io = new Server(server, {
+    cors : {
+        origin : 'http://localhost:5173',
+        methods : ["GET", "POST"]
+    }
+})
 
 app.use('/api/auth', authRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/admin', adminRoutes);
+
+const tasks = [];
+
+io.on('connection', (socket) => {
+    console.log('A user connected', socket.id);
+
+    socket.on('createTask', (task) => {
+        console.log('New Task Created', task);
+        socket.broadcast.emit('newTask', task);
+    })
+
+    socket.on('disconnect', () => {
+        console.log('A user disconencted', socket.id);
+    })
+})
 
 app.get('/', async(req, res) => {
 
@@ -202,7 +230,11 @@ connectDB();
 
 connectDB2();
 
-app.listen(PORT, () => {
+// app.listen(PORT, () => {
+//     console.log(`Server is listening on the port ${PORT}`);
+// })
+
+server.listen(PORT, () => {
     console.log(`Server is listening on the port ${PORT}`);
 })
 
