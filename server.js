@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authroutes');
 
 const homeRoutes = require('./routes/homeroutes');
 
+//a
+
 const adminRoutes = require('./routes/adminroutes');
 
 const connectDB = require('./database/database');
