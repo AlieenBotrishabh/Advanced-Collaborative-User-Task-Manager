@@ -1,10 +1,9 @@
-import React from 'react';
 import NewTask from './components/NewTask';
 import HomePage from './components/HomePage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const App = () => {
-    const router = ([
+    const router = createBrowserRouter([
         {
             path : '/',
             element : <HomePage />
@@ -16,7 +15,6 @@ const App = () => {
     ])
   return (
     <>
-    <div>App</div>
     <RouterProvider router={router} />
     </>
   )
