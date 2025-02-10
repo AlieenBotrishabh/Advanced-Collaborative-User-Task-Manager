@@ -1,6 +1,7 @@
 import NewTask from './components/NewTask';
 import HomePage from './components/HomePage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
 
 const App = () => {
     const router = createBrowserRouter([
@@ -12,6 +13,10 @@ const App = () => {
             path : '/task',
             element : <NewTask />
         },
+        {
+          path : '/login',
+          element : <LoginPage />
+        }
     ])
   return (
     <>
