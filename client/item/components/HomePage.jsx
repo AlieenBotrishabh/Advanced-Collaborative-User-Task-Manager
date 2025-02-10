@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   return (
@@ -11,9 +12,9 @@ const HomePage = () => {
         <span className='text-white'> Flow </span>
       </div>
       <div className='space-x-20 text-xl'>
-        <a className='text-gray-300 hover:text-white' href="#">Home</a>
-        <a className='text-gray-300 hover:text-white' href="#">Task</a>
-        <a className='text-gray-300 hover:text-white' href="#">About Us</a>
+        <Link className='text-gray-300 hover:text-white' to="/">Home</Link>
+        <Link className='text-gray-300 hover:text-white' to="/task">Task</Link>
+        <Link className='text-gray-300 hover:text-white' to="#">About Us</Link>
         <button className='bg-blue-600 text-white px-4 py-1 rounded-lg text-lg hover:bg-blue-700 transition duration-300'>Login</button>
       </div>
     </div>
