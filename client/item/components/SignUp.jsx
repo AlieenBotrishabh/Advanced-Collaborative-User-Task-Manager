@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
+import Navbar from './Navbar';
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -29,6 +30,8 @@ const SignUp = () => {
     };
 
     return (
+        <>
+        <Navbar />
         <div className='flex items-center justify-center min-h-screen bg-gray-100'>
             <form className='w-full sm:w-1/3 md:w-1/4 bg-white p-8 rounded-lg shadow-lg' onSubmit={handleSubmit}>
                 <div className='text-center mb-6'>
@@ -94,6 +97,7 @@ const SignUp = () => {
                 </div>
             </form>
         </div>
+        </>
     );
 };
 

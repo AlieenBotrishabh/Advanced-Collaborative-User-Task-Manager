@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import Navbar from './Navbar';
 
 const socket = io('http://localhost:5000');
 
@@ -51,6 +52,8 @@ function NewTask() {
     };
 
     return (
+        <>
+        <Navbar />
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">Real-Time Task Manager</h1>
             <div className="text-sm mb-2">
@@ -79,6 +82,7 @@ function NewTask() {
                 ))}
             </ul>
         </div>
+        </>
     );
 }
 
