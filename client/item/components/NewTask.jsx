@@ -14,6 +14,7 @@ function NewTask() {
     const navigate = useNavigate();
 
     const handleSubmit = async(e) => {
+        e.preventDefault();
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
 
@@ -23,9 +24,13 @@ function NewTask() {
                 method : "POST",
                 headers : {
                     'Content-type' : 'application/json',
-                    body : JSON.stringify(data)
-                }
+                }, body : JSON.stringify(data)
             })
+
+            if(!data.task || !data.description || ! data.priority || data.deadline)
+            {
+                alert('All fields required');
+            }
 
             if(response.ok)
             {
@@ -124,25 +129,27 @@ function NewTask() {
 
             <h2 className="text-xl font-semibold mb-4 text-center">Add New Task</h2>
 
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-gray-700">Task Name</label>
                 <input 
                   type="text"
-                  id="name"
-                  name="name"
+                  id="task"
+                  name="task"
                   className="w-full border p-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" 
                   placeholder="Enter task name" 
+                  required
                 />
               </div>
 
               <div className="mb-4">
                 <label className="block text-gray-700">Description</label>
-                <textarea 
+                <input
                   className="w-full border p-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   id="description"
                   name="description"
                   placeholder="Enter task description"
+                  required
                 />
               </div>
 
@@ -153,6 +160,7 @@ function NewTask() {
                 id="priority"
                 name="priority"
                 placeholder="Add task priority"
+                required
                 ></input>
               </div>
 
@@ -162,7 +170,8 @@ function NewTask() {
                 type="date"
                 id="deadline"
                 name="deadline"
-                placeholder="Add task deadline" />
+                placeholder="Add task deadline"
+                required />
               </div>
 
               <button 
@@ -179,7 +188,7 @@ function NewTask() {
 
       <div>
       <div className="w-full flex flex-wrap gap-4 justify-center p-4">
-  <div className='w-[250px] h-[350px] border-2 border-gray-950 rounded-lg shadow-lg overflow-hidden bg-white'>
+  <div className='w-[250px] h-[350px] border-2 border-gray-800 rounded-lg shadow-lg overflow-hidden bg-white'>
     <img src={image2} alt='Task Image' className='w-full h-[150px] object-cover' />
     <div className='p-4'>
       <h2 className='text-lg font-bold text-gray-800'>Task Name</h2>
@@ -189,54 +198,7 @@ function NewTask() {
         <p className='text-sm mt-1'><span className='font-semibold'>Deadline:</span> 2025-02-20</p>
       </div>
     </div>
-  </div>
 
-  <div className='w-[250px] h-[350px] border-2 border-gray-950 rounded-lg shadow-lg overflow-hidden bg-white'>
-    <img src={image2} alt='Task Image' className='w-full h-[150px] object-cover' />
-    <div className='p-4'>
-      <h2 className='text-lg font-bold text-gray-800'>Task Name</h2>
-      <p className='text-sm text-gray-600 mt-2'>This is a description of the task detailing what needs to be done.</p>
-      <div className='mt-4'>
-        <p className='text-sm'><span className='font-semibold'>Priority:</span> <span className='text-red-500'>High</span></p>
-        <p className='text-sm mt-1'><span className='font-semibold'>Deadline:</span> 2025-02-20</p>
-      </div>
-    </div>
-  </div>
-
-  <div className='w-[250px] h-[350px] border-2 border-gray-950 rounded-lg shadow-lg overflow-hidden bg-white'>
-    <img src={image2} alt='Task Image' className='w-full h-[150px] object-cover' />
-    <div className='p-4'>
-      <h2 className='text-lg font-bold text-gray-800'>Task Name</h2>
-      <p className='text-sm text-gray-600 mt-2'>This is a description of the task detailing what needs to be done.</p>
-      <div className='mt-4'>
-        <p className='text-sm'><span className='font-semibold'>Priority:</span> <span className='text-red-500'>High</span></p>
-        <p className='text-sm mt-1'><span className='font-semibold'>Deadline:</span> 2025-02-20</p>
-      </div>
-    </div>
-  </div>
-
-  <div className='w-[250px] h-[350px] border-2 border-gray-950 rounded-lg shadow-lg overflow-hidden bg-white'>
-    <img src={image2} alt='Task Image' className='w-full h-[150px] object-cover' />
-    <div className='p-4'>
-      <h2 className='text-lg font-bold text-gray-800'>Task Name</h2>
-      <p className='text-sm text-gray-600 mt-2'>This is a description of the task detailing what needs to be done.</p>
-      <div className='mt-4'>
-        <p className='text-sm'><span className='font-semibold'>Priority:</span> <span className='text-red-500'>High</span></p>
-        <p className='text-sm mt-1'><span className='font-semibold'>Deadline:</span> 2025-02-20</p>
-      </div>
-    </div>
-  </div>
-
-  <div className='w-[250px] h-[350px] border-2 border-gray-950 rounded-lg shadow-lg overflow-hidden bg-white'>
-    <img src={image2} alt='Task Image' className='w-full h-[150px] object-cover' />
-    <div className='p-4'>
-      <h2 className='text-lg font-bold text-gray-800'>Task Name</h2>
-      <p className='text-sm text-gray-600 mt-2'>This is a description of the task detailing what needs to be done.</p>
-      <div className='mt-4'>
-        <p className='text-sm'><span className='font-semibold'>Priority:</span> <span className='text-red-500'>High</span></p>
-        <p className='text-sm mt-1'><span className='font-semibold'>Deadline:</span> 2025-02-20</p>
-      </div>
-    </div>
   </div>
       </div>
 
