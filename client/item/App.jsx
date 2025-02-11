@@ -2,6 +2,7 @@ import NewTask from './components/NewTask';
 import HomePage from './components/HomePage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
+import SignUp from './components/SignUp';
 
 const App = () => {
     const router = createBrowserRouter([
@@ -16,6 +17,10 @@ const App = () => {
         {
           path : '/login',
           element : <LoginPage />
+        },
+        {
+          path : '/register',
+          element : <SignUp />
         }
     ])
   return (

@@ -2,6 +2,8 @@ const express = require('express');
 
 const app = express();
 
+const cors = require('cors')
+
 const http = require('http');
 
 const server = http.createServer(app);
@@ -30,10 +32,15 @@ const Model = require('./schema/task');
 
 app.use(express.json());
 
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
 const io = new Server(server, {
     cors : {
         origin : 'http://localhost:5173',
-        methods : ["GET", "POST"]
+        methods : ["GET", "POST", "PUT", "DELETE"]
     }
 })
 

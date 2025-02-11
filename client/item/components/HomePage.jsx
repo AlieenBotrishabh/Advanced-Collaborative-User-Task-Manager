@@ -15,7 +15,7 @@ const HomePage = () => {
         <Link className='text-gray-800 hover:text-white' to="/">Home</Link>
         <Link className='text-gray-800 hover:text-white' to="/task">Task</Link>
         <Link className='text-gray-800 hover:text-white' to="#">About Us</Link>
-        <Link className='bg-blue-600 text-white px-4 py-1 rounded-lg text-lg hover:bg-blue-700 transition duration-300' to="#">Login</Link>
+        <Link className='bg-blue-600 text-white px-4 py-1 rounded-lg text-lg hover:bg-blue-700 transition duration-300' to="/login">Login</Link>
       </div>
     </div>
   </nav>
@@ -26,7 +26,7 @@ const HomePage = () => {
         <span className='text-pink-600'>Manage</span>, Organize, and 
         <span className='text-blue-600'> Prioritize</span> Your Tasks</h1>
     <p className='text-lg text-gray-800 mb-6'>Stay productive with our easy-to-use task management system.</p>
-    <Link className='bg-green-600 text-white px-6 py-2 rounded-lg text-lg hover:bg-green-700 transition duration-300' to="/task">
+    <Link className='bg-green-600 text-white px-6 py-2 rounded-lg text-lg hover:bg-green-700 transition duration-300' to="/register">
     Get Started
     </Link>
   </div>
