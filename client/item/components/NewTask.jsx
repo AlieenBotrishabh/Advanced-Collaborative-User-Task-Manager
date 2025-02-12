@@ -188,7 +188,7 @@ function NewTask() {
 
       <div>
       <div className="w-full flex flex-wrap gap-4 justify-center p-4">
-  <div className='w-[250px] h-[350px] border-2 border-gray-800 rounded-lg shadow-lg overflow-hidden bg-white'>
+  <div className='w-[500px] h-[350px] border-2 border-gray-800 rounded-lg shadow-lg overflow-hidden bg-white'>
     <div className='p-4'>
       <h2 className='text-lg font-bold text-gray-800'>Task Name</h2>
       <p className='text-sm text-gray-600 mt-2'>This is a description of the task detailing what needs to be done.</p>
