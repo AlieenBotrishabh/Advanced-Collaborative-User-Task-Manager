@@ -27,7 +27,7 @@ function NewTask() {
                 }, body : JSON.stringify(data)
             })
 
-            if(!data.task || !data.description || ! data.priority || data.deadline)
+            if(!data.task || !data.description || ! data.priority || !data.deadline)
             {
                 alert('All fields required');
             }
@@ -189,16 +189,14 @@ function NewTask() {
       <div>
       <div className="w-full flex flex-wrap gap-4 justify-center p-4">
   <div className='w-[250px] h-[350px] border-2 border-gray-800 rounded-lg shadow-lg overflow-hidden bg-white'>
-    <img src={image2} alt='Task Image' className='w-full h-[150px] object-cover' />
     <div className='p-4'>
       <h2 className='text-lg font-bold text-gray-800'>Task Name</h2>
       <p className='text-sm text-gray-600 mt-2'>This is a description of the task detailing what needs to be done.</p>
       <div className='mt-4'>
-        <p className='text-sm'><span className='font-semibold'>Priority:</span> <span className='text-red-500'>High</span></p>
+        <p className='text-sm'><span className='font-semibold'>Priority:</span> <span className='text-'>2</span></p>
         <p className='text-sm mt-1'><span className='font-semibold'>Deadline:</span> 2025-02-20</p>
       </div>
     </div>
-
   </div>
       </div>
 
