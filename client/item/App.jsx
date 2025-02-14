@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import SignUp from './components/SignUp';
 import Projects from './components/Projects';
+import Calender from './components/Calender';
 
 const App = () => {
     const router = createBrowserRouter([
@@ -26,6 +27,10 @@ const App = () => {
         {
           path : '/project',
           element : <Projects />
+        },
+        {
+          path : '/calender',
+          element : <Calender />
         }
     ])
   return (
