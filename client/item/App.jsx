@@ -5,6 +5,7 @@ import LoginPage from './components/LoginPage';
 import SignUp from './components/SignUp';
 import Projects from './components/Projects';
 import Calender from './components/Calender';
+import NewProject from './components/NewProject';
 
 const App = () => {
     const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const App = () => {
         {
           path : '/calender',
           element : <Calender />
+        },
+        {
+          path : '/newproject',
+          element : <NewProject />
         }
     ])
   return (

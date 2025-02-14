@@ -25,6 +25,7 @@ const TaskCalendar = () => {
     <h1 className="text-5xl font-bold">Welcome to Project Calendar</h1>
     </div>
 
+    <div>
     <FullCalendar
       plugins={[dayGridPlugin, interactionPlugin]}
       initialView="dayGridMonth"
@@ -32,6 +33,7 @@ const TaskCalendar = () => {
       dateClick={handleDateClick} // Click to add tasks
       editable={true} // Enable drag and drop
     />
+    </div>
     </div>
     </>
   );

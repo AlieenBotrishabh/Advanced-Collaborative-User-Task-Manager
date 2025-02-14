@@ -14,8 +14,7 @@ const Projects = () => {
 
         <div className='w-full h-[700px] flex flex-col items-center'>
           <div className='w-full h-[700px] flex justify-center items-center p-4 m-4 relative'>
-            <img className='w-[400px] h-[400px] opacity-50 z-0' src={image3} alt="" />
-            <Link className='bg-blue-700 text-white p-2 m-4 rounded-lg z-10 absolute' to='/newproject'>Add New Project</Link>
+            <div className=''></div>
           </div>
           <div className='w-full h-2/4 flex justify-center items-center'>
           </div>
