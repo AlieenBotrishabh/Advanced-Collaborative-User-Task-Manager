@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './Navbar';
 import image3 from '../assets/A3.gif';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
-const Projects = () => {
+const NewProject = () => {
   return (
     <>
       <Navbar />
@@ -24,4 +24,4 @@ const Projects = () => {
   );
 }
 
-export default Projects;
+export default NewProject;

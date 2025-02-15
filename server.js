@@ -161,77 +161,67 @@ app.put('/user/:id', async(req, res) => {
     }
 })
 
-app.get('/task', async(req, res) => {
-    try
-    {
-        const task = await Model.find({});
-
-        res.status(200).json({
-            msg : 'Task found successfully',
-            task
-        })
+// GET /tasks
+app.get('/tasks', async(req, res) => {
+    try {
+        const tasks = await Model.find({});
+        res.status(200).json(tasks); // Send array directly
     }
-    catch(err)
-    {
+    catch(err) {
         res.status(400).json({
-            msg : 'Task not found'
-        })
+            msg: 'Tasks not found',
+            error: err.message
+        });
     }
-})
+});
 
-app.post('/task', async(req, res) => {
-    try
-    {
-        const { task, description, priority, deadline } = req.body;
+// POST /tasks
+app.post('/tasks', async(req, res) => {
+    try {
+        const { task, description, priority, deadline, status, progress } = req.body;
+        const newTask = await Model.create({
+            task,
+            description,
+            priority,
+            deadline,
+            status: status || 'pending',
+            progress: progress || 0
+        });
 
-    const Task = await Model.create({
-        task : task,
-        description : description,
-        priority : priority,
-        deadline : deadline
-    })
-
-    res.status(200).json({
-        msg : 'Task created successfully',
-        Task
-    })
+        res.status(200).json(newTask); // Send task directly
     }
-    catch(err)
-    {
+    catch(err) {
         res.status(400).json({
-            msg : 'Task not created'
-        })
-
-        console.log(`An error ocurred ${err}`);
+            msg: 'Task not created',
+            error: err.message
+        });
     }
-})
+});
 
-app.put('/task/:id', async(req, res) => {
+// Add PATCH endpoint for updating status
+app.patch('/tasks/:id', async(req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, progress } = req.body;
+        
+        const updatedTask = await Model.findByIdAndUpdate(
+            id,
+            { status, progress },
+            { new: true, runValidators: true }
+        );
 
-    const { id } = req.params;
+        if (!updatedTask) {
+            return res.status(404).json({ msg: 'Task not found' });
+        }
 
-    const { task, description, priority, deadline } = req.body;
-
-    const createdTask = await Model.findByIdAndUpdate(
-        id,
-        { task, description, priority, deadline },
-        { new : true, runValidators : true }
-    )
-
-    if(!createdTask)
-    {
+        res.status(200).json(updatedTask);
+    } catch(err) {
         res.status(400).json({
-            msg : 'Task not found'
-        })
+            msg: 'Failed to update task',
+            error: err.message
+        });
     }
-    else
-    {
-        res.status(200).json({
-            msg : 'Task found successfully',
-            createdTask
-        })
-    }
-})
+});
 
 connectDB();
 
