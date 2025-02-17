@@ -8,6 +8,8 @@ const http = require('http');
 
 const server = http.createServer(app);
 
+const ProjectDB = require('./projects/project');
+
 const { Server } = require('socket.io');
 
 require('dotenv').config();
@@ -25,6 +27,8 @@ const adminRoutes = require('./routes/adminroutes');
 const connectDB = require('./database/database');
 
 const connectDB2 = require('./database/database2');
+
+const connectDB3 = require('./database/database3');
 
 const Task = require('./model/model');
 
@@ -223,9 +227,99 @@ app.patch('/tasks/:id', async(req, res) => {
     }
 });
 
+app.get('/projects', async (req, res) => {
+    try {
+        const projects = await ProjectDB.find().sort({ createdAt: -1 });
+        res.json(projects);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Create new project
+app.post('/projects', async (req, res) => {
+    const project = new ProjectDB({
+        name: req.body.name,
+        username: req.body.username,
+        language: req.body.language,
+        deadline: req.body.deadline,
+        description: req.body.description,
+        progress: 0,
+        status: 'pending',
+        updates: [],
+    });
+
+    try {
+        const newProject = await project.save();
+        res.status(201).json(newProject);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// Update project
+app.patch('/projects/:id', async (req, res) => {
+    try {
+        const project = await ProjectDB.findById(req.params.id);
+        if (!project) return res.status(404).json({ message: 'Project not found' });
+
+        // Update fields
+        Object.keys(req.body).forEach(key => {
+            project[key] = req.body[key];
+        });
+
+        // Add update to history
+        project.updates.push({
+            timestamp: new Date(),
+            type: 'status_change',
+            newStatus: req.body.status
+        });
+
+        const updatedProject = await project.save();
+        res.json(updatedProject);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// Get project analytics
+app.get('/projects/analytics', async (req, res) => {
+    try {
+        const projects = await ProjectDB.find();
+        
+        // Create analytics data for the last 7 days
+        const analytics = Array.from({ length: 7 }, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            return {
+                date: date.toISOString().split('T')[0],
+                updates: 0
+            };
+        }).reverse();
+
+        // Count updates for each day
+        projects.forEach(project => {
+            project.updates.forEach(update => {
+                const updateDate = new Date(update.timestamp).toISOString().split('T')[0];
+                const analyticsEntry = analytics.find(a => a.date === updateDate);
+                if (analyticsEntry) {
+                    analyticsEntry.updates++;
+                }
+            });
+        });
+
+        res.json(analytics);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
 connectDB();
 
 connectDB2();
+
+connectDB3();
 
 // app.listen(PORT, () => {
 //     console.log(`Server is listening on the port ${PORT}`);

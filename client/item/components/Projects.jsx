@@ -2,20 +2,25 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import image3 from '../assets/A3.gif';
-import { Link } from 'react-router-dom';
+import { Plus, X } from 'lucide-react';
 
 const Projects = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [newTask, setNewTask] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
+    const data = {
+      ...Object.fromEntries(formData),
+      username: 'default', // You might want to get this from your auth system
+      progress: 0,
+      status: 'pending'
+    };
 
     try {
-      const response = await fetch('http://localhost:5000', {
+      const response = await fetch('http://localhost:5000/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -24,84 +29,96 @@ const Projects = () => {
       });
 
       if (response.ok) {
+        setShowForm(false);
         navigate('/newproject');
       } else {
-        console.error('Failed to submit task');
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to submit project');
       }
     } catch (err) {
+      setError('An error occurred while creating the project');
       console.error('An error occurred:', err);
     }
   };
 
-  const handleAddTaskClick = () => {
+  const handleAddProjectClick = () => {
     setShowForm(!showForm);
+    setError('');
   };
 
   return (
     <>
       <Navbar />
-      <div className='w-full h-full bg-black text-white flex flex-col items-center'>
-        <div className='w-full h-[100px] flex justify-center items-center border-gray-800 border-b-2'>
-          <h1 className='text-5xl font-bold'>Welcome to Projects!</h1>
+      <div className='min-h-screen bg-black text-white'>
+        <div className='w-full border-b border-gray-800'>
+          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+            <h1 className='text-5xl font-bold text-center'>Welcome to Projects!</h1>
+          </div>
         </div>
 
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="bg-black text-white shadow-lg p-6 rounded-lg w-full max-w-md relative">
+            <div className="bg-gray-900 text-white shadow-lg p-6 rounded-lg w-full max-w-md relative border border-gray-800">
               <button 
-                onClick={handleAddTaskClick} 
-                className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
+                onClick={handleAddProjectClick} 
+                className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors duration-200"
+                aria-label="Close form"
               >
-                ✖
+                <X size={20} />
               </button>
 
-              <h2 className="text-xl font-semibold mb-4 text-center">Add New Project</h2>
+              <h2 className="text-xl font-semibold mb-6 text-center">Add New Project</h2>
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded-lg text-red-200 text-sm">
+                  {error}
+                </div>
+              )}
 
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
-                  <label className="block text-white">Project Name</label>
+                  <label className="block text-gray-300 mb-1">Project Name</label>
                   <input 
                     type="text"
-                    id="task"
-                    name="task"
-                    className="w-full bg-gray-800 text-white border p-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    placeholder="Enter task name" 
+                    name="name"
+                    className="w-full bg-gray-800 text-white border border-gray-700 p-2 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    placeholder="Enter project name" 
                     required
                   />
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-white">Description</label>
-                  <input
-                    className="w-full bg-gray-800 text-white border p-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    id="description"
+                  <label className="block text-gray-300 mb-1">Description</label>
+                  <textarea
+                    className="w-full bg-gray-800 text-white border border-gray-700 p-2 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     name="description"
-                    placeholder="Enter task description"
+                    placeholder="Enter project description"
+                    rows="3"
                     required
                   />
                 </div>
 
                 <div className="mb-4">
-                  <label className='block text-white'>Language</label>
+                  <label className='block text-gray-300 mb-1'>Language</label>
                   <select
                     name="language"
-                    className="w-full bg-gray-800 text-white border p-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                    className="w-full bg-gray-800 text-white border border-gray-700 p-2 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
-                    <option value="">Select a language</option>
-                    <option value="C++">C++</option>
-                    <option value="Python">Python</option>
-                    <option value="Dart">Dart</option>
-                    <option value="Java">Java</option>
-                    <option value="JavaScript">JavaScript</option>
+                    <option value="" className="bg-gray-800">Select a language</option>
+                    <option value="C++" className="bg-gray-800">C++</option>
+                    <option value="Python" className="bg-gray-800">Python</option>
+                    <option value="Dart" className="bg-gray-800">Dart</option>
+                    <option value="Java" className="bg-gray-800">Java</option>
+                    <option value="JavaScript" className="bg-gray-800">JavaScript</option>
                   </select>
                 </div>
 
-                <div className="mb-4">
-                  <label className='block text-white'>Deadline</label>
-                  <input className='w-full bg-gray-800 text-white border p-2 rounded mt-1'
+                <div className="mb-6">
+                  <label className='block text-gray-300 mb-1'>Deadline</label>
+                  <input 
+                    className='w-full bg-gray-800 text-white border border-gray-700 p-2 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500'
                     type="date"
-                    id="deadline"
                     name="deadline"
                     required 
                   />
@@ -109,24 +126,32 @@ const Projects = () => {
 
                 <button 
                   type="submit" 
-                  className="bg-blue-600 text-white py-2 px-4 rounded-lg w-full hover:bg-blue-700"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2"
                 >
-                  Save Project
+                  <Plus size={20} />
+                  Create Project
                 </button>
               </form>
             </div>
           </div>
         )}
 
-        <div className='w-full h-[700px] flex flex-col items-center'>
-          <div className='w-full h-[700px] flex justify-center items-center p-4 m-4 relative'>
-            <img className='w-[400px] h-[400px] opacity-50 z-0' src={image3} alt="" />
-            <button 
-              className='bg-blue-700 text-white p-2 m-4 rounded-lg z-10 absolute' 
-              onClick={handleAddTaskClick}
-            >
-              Add New Task
-            </button>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+          <div className='flex flex-col items-center justify-center relative'>
+            <div className='relative w-full max-w-lg aspect-square flex items-center justify-center'>
+              <img 
+                className='w-full h-full object-contain opacity-50' 
+                src={image3} 
+                alt="Project illustration" 
+              />
+              <button 
+                className='absolute bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2'
+                onClick={handleAddProjectClick}
+              >
+                <Plus size={20} />
+                Add New Project
+              </button>
+            </div>
           </div>
         </div>
       </div>
