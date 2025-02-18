@@ -6,6 +6,7 @@ import SignUp from './components/SignUp';
 import Projects from './components/Projects';
 import Calender from './components/Calender';
 import NewProject from './components/NewProject';
+import Note from './components/Note';
 
 const App = () => {
     const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const App = () => {
         {
           path : '/newproject',
           element : <NewProject />
+        },
+        {
+          path : '/notes/:projectId',
+          element : <Note />
         }
     ])
   return (

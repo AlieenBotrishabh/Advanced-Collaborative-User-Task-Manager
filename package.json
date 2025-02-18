@@ -19,5 +19,8 @@
     "mongoose": "^8.10.0",
     "nodemon": "^3.1.9",
     "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "shadcn-ui": "^0.9.4"
   }
 }

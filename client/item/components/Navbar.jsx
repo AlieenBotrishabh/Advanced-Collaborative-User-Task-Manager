@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import image from '../assets/A.png';
+import image6 from '../assets/A6.png'
 
 const Navbar = () => {
   return (
@@ -9,20 +10,9 @@ const Navbar = () => {
             <div className="flex items-center space-x-8">
               {/* Logo */}
               <div className="flex items-center space-x-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 text-indigo-500"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.5a.75.75 0 00.75.75H9.75a.75.75 0 00.75-.75v-4.125c0-.621.504-1.125 1.125-1.125h1.5c.621 0 1.125.504 1.125 1.125V19.5a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75V9.75"
-                  />
-                </svg>
+                <Link to='/'>
+                <img src={image6} alt="" className='w-[40px] rounded-2xl' />
+                </Link>
               </div>
       
               {/* Nav Links */}
