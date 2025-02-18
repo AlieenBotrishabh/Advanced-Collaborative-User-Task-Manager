@@ -50,25 +50,21 @@ const LoginPage = () => {
     return (
         <>
         <Navbar />
-        <div className='flex items-center justify-center min-h-screen bg-gray-100'>
-            <form className='w-full sm:w-1/3 md:w-1/4 bg-white p-8 rounded-lg shadow-lg' onSubmit={handleSubmit}>
+        <div className='flex items-center justify-center min-h-screen bg-white'>
+            <form className='w-full sm:w-1/3 md:w-2/4 bg-white p-8 rounded-lg shadow-lg' onSubmit={handleSubmit}>
                 <div className='text-center mb-6'>
-                    <div className='text-3xl font-bold text-gray-800'>Login</div>
-                    {serverStatus === 'disconnected' && (
-                        <div className='text-red-500 text-sm mt-2'>
-                            Server connection failed. Please ensure the backend is running.
-                        </div>
-                    )}
+                    <div className='text-3xl font-bold text-gray-800'>Login to Existing Account</div>
                 </div>
 
                 <div className='flex flex-col space-y-4'>
                     <div>
                         <label className='text-lg font-medium text-gray-700' htmlFor="empid">
-                            Employee Id
+                            Username
                         </label>
                         <input
                             className='w-full border-2 border-gray-300 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition duration-300'
                             type="text"
+                            placeholder='Username'
                             id="empid"
                             value={empid}
                             onChange={(e) => setEmpid(e.target.value)}
@@ -84,6 +80,7 @@ const LoginPage = () => {
                         <input
                             className='w-full border-2 border-gray-300 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition duration-300'
                             type="password"
+                            placeholder='Password'
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}

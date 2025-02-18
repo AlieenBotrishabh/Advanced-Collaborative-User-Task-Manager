@@ -36,7 +36,7 @@ const App = () => {
         {
           path : '/newproject',
           element : <NewProject />
-        },
+        }
     ])
   return (
     <>
