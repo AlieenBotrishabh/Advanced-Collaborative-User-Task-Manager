@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -100,6 +101,11 @@ const LoginPage = () => {
                     >
                         {isLoading ? 'Logging in...' : 'Login'}
                     </button>
+                </div>
+
+                <div className='flex justify-center items-end m-2'>
+                    <p className='mr-2'>Not Having Account</p>
+                    <Link to='/register'><span className='text-blue-500'>Sign Up</span></Link>
                 </div>
             </form>
         </div>
