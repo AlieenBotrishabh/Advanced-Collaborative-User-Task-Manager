@@ -39,6 +39,7 @@ const Navbar = () => {
             {/* Right Section */}
             <div className="flex items-center space-x-4">
               {/* Search Bar */}
+              <Link to='/login' className='w-[100px] h-[30px] bg-indigo-500 text-white text-center rounded-lg'>Login</Link>
               <div className="relative">
                 <input
                   type="text"

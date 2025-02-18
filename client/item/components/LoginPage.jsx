@@ -10,32 +10,12 @@ const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [serverStatus, setServerStatus] = useState(null);
 
-    // Test server connection on component mount
-    useEffect(() => {
-        const testConnection = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/test');
-                const data = await response.json();
-                setServerStatus('connected');
-            } catch (err) {
-                console.error('Server connection test failed:', err);
-                setServerStatus('disconnected');
-            }
-        };
-
-        testConnection();
-    }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
         try {
-            // First, check if server is reachable
-            if (serverStatus !== 'connected') {
-                throw new Error('Server is not accessible');
-            }
 
             const response = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
