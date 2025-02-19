@@ -7,7 +7,8 @@ import Navbar from './Navbar';
 
 // Update socket connection to match backend CORS settings
 const socket = io('http://localhost:5000', {
-    withCredentials: true
+    withCredentials: true,
+    transports: ['websocket', 'polling']
 });
 
 const CustomAlert = ({ message }) => (
@@ -70,23 +71,17 @@ function NewProject() {
     const [analyticsError, setAnalyticsError] = useState(null);
 
     useEffect(() => {
-        socket.on('connect', () => {
-            setConnected(true);
+        socket.on('projectUpdated', (updatedProject) => {
+            setProjects(prev =>
+                prev.map(project =>
+                    project._id === updatedProject._id ? updatedProject : project
+                )
+            );
+            fetchAnalytics();
         });
-
-        socket.on('disconnect', () => {
-            setConnected(false);
-        });
-
-        // Listen for new project updates
-        socket.on('newTask', (task) => {
-            fetchProjects(); // Refresh projects when new task is created
-        });
-
+    
         return () => {
-            socket.off('connect');
-            socket.off('disconnect');
-            socket.off('newTask');
+            socket.off('projectUpdated');
         };
     }, []);
 
@@ -106,6 +101,28 @@ function NewProject() {
             setError(null);
         } catch (err) {
             setError('Failed to load projects');
+            console.error(err);
+        }
+    };
+
+    const deleteProject = async (projectId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/projects/${projectId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to delete project');
+            }
+            
+            // Remove project from state
+            setProjects(prev => prev.filter(project => project._id !== projectId));
+            
+            // Refresh analytics after deletion
+            fetchAnalytics();
+        } catch (err) {
+            setError('Failed to delete project');
             console.error(err);
         }
     };
@@ -134,28 +151,32 @@ function NewProject() {
         try {
             const response = await fetch(`http://localhost:5000/projects/${projectId}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status, progress }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ status, progress, timestamp: new Date().toISOString() })
             });
-            
+    
             if (!response.ok) {
-                throw new Error('Failed to update project');
+                const errorData = await response.json();
+                console.error("Error Response:", errorData);
+                throw new Error(errorData.message || 'Failed to update project');
             }
-            
+    
             const updatedProject = await response.json();
             setProjects(prev =>
                 prev.map(project =>
                     project._id === projectId ? updatedProject : project
                 )
             );
-            
-            // Refresh analytics after update
             fetchAnalytics();
         } catch (err) {
-            setError('Failed to update project');
-            console.error(err);
+            console.error('Update project error:', err);
+            setError(err.message || 'Failed to update project');
         }
     };
+    
 
     const ProjectCard = ({ project }) => (
         <div className="w-full md:w-[500px] h-auto border border-gray-700 rounded-xl shadow-lg overflow-hidden bg-gray-800 hover:shadow-xl transition-shadow duration-300">
@@ -174,6 +195,13 @@ function NewProject() {
                         >
                             <FileText className="w-4 h-4" />
                         </button>
+                        <button
+                            onClick={() => deleteProject(project._id)}
+                            className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                            title="Delete Project"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
                 
@@ -186,7 +214,7 @@ function NewProject() {
                             Deadline: {new Date(project.deadline).toLocaleDateString()}
                         </span>
                     </div>
-
+    
                     <div className="space-y-2">
                         <div className="flex justify-between text-sm text-gray-400">
                             <span>Progress</span>
@@ -199,7 +227,7 @@ function NewProject() {
                             />
                         </div>
                     </div>
-
+    
                     <div className="flex gap-2 pt-2">
                         <button
                             onClick={() => updateProjectStatus(project._id, 'pending', 0)}

@@ -33,9 +33,24 @@ const projectSchema = new mongoose.Schema({
         max: 100
     },
     updates: [{
-        timestamp: Date,
-        type: String,
-        newStatus: String
+        timestamp: {
+            type: Date,
+            default: Date.now
+        },
+        type: {
+            type: String,
+            required: true
+        },
+        newStatus: {
+            type: String,
+            enum: ['pending', 'in-progress', 'completed'],
+            required: true
+        },
+        newProgress: {
+            type: Number,
+            min: 0,
+            max: 100
+        }
     }],
     createdAt: {
         type: Date,

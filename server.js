@@ -37,16 +37,21 @@ const Model = require('./schema/task');
 app.use(express.json());
 
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
+    origin: 'http://localhost:5175',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type'],
 }));
 
 const io = new Server(server, {
-    cors : {
-        origin : 'http://localhost:5173',
-        methods : ["GET", "POST", "PUT", "DELETE"]
-    }
-})
+    cors: {
+        origin: 'http://localhost:5175',
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+        credentials: true,
+        allowedHeaders: ['Content-Type']
+    },
+    allowEIO3: true // Enable compatibility mode
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/home', homeRoutes);
@@ -263,27 +268,45 @@ app.post('/projects', async (req, res) => {
 // Update project
 app.patch('/projects/:id', async (req, res) => {
     try {
-        const project = await ProjectDB.findById(req.params.id);
-        if (!project) return res.status(404).json({ message: 'Project not found' });
+        const { id } = req.params;
+        const { status, progress } = req.body;
+        
+        if (!status || progress === undefined) {
+            return res.status(400).json({ 
+                message: 'Status and progress are required fields' 
+            });
+        }
 
-        // Update fields
-        Object.keys(req.body).forEach(key => {
-            project[key] = req.body[key];
-        });
+        const project = await ProjectDB.findById(id);
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
 
-        // Add update to history
+        // Ensure updates are pushed as an object
         project.updates.push({
             timestamp: new Date(),
             type: 'status_change',
-            newStatus: req.body.status
+            newStatus: status,
+            newProgress: progress
         });
 
+        project.status = status;
+        project.progress = progress;
+
         const updatedProject = await project.save();
+        
+        io.emit('projectUpdated', updatedProject);
+        
         res.json(updatedProject);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        console.error('Project update error:', err);
+        res.status(400).json({ 
+            message: 'Failed to update project',
+            error: err.message 
+        });
     }
 });
+
 
 // Get project analytics
 app.get('/projects/analytics', async (req, res) => {
@@ -312,6 +335,20 @@ app.get('/projects/analytics', async (req, res) => {
         });
 
         res.json(analytics);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.delete('/projects/:id', async (req, res) => {
+    try {
+        const project = await ProjectDB.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
+        await ProjectDB.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Project deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
