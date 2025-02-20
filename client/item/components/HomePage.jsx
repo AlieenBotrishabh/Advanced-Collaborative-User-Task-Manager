@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import image7 from '../assets/A7.png';
+import image8 from '../assets/A8.png';
+import image9 from '../assets/A9.png';
 
 const HomePage = () => {
   return (
@@ -20,6 +23,39 @@ const HomePage = () => {
 </div>
 
 <div className='w-full h-full bg-black p-4 mb-4'>
+
+<div className='w-full bg-gray-900 p-4 m-4 flex flex-col items-center'>
+  <div className='flex justify-center items-center'>
+    <h1 className='text-white text-5xl font-bold p-4 m-4'>How to Use</h1>
+  </div>
+
+  <div className='w-full flex flex-row items-center p-4 m-4 space-x-2'>
+    <div className='w-[400px] h-[275px] bg-gray-800 flex flex-col items-center border border-gray-400 rounded-lg'>
+      <div className='w-full h-1/2 flex justify-center items-center'>
+        <img src={image7} alt="" className='w-[50px]' />
+      </div>
+      <div className='w-full h-1/2 flex flex-col items-center'>
+    <p className='text-gray-400 text-lg'>Register Your account</p>
+    </div>
+    </div>
+    <div className='w-[400px] h-[275px] bg-gray-800 flex flex-col items-center border border-gray-400 rounded-lg'>
+      <div className='w-full h-1/2 flex justify-center items-center'>
+        <img src={image8} alt="" className='w-[50px]' />
+      </div>
+      <div className='w-full h-1/2 flex flex-col items-center'>
+    <p className='text-gray-400 text-lg'>Add Task</p>
+    </div>
+    </div>
+    <div className='w-[400px] h-[275px] bg-gray-800 flex flex-col items-center border border-gray-400 rounded-lg'>
+      <div className='w-full h-1/2 flex justify-center items-center'>
+        <img src={image9} alt="" className='w-[50px]' />
+      </div>
+      <div className='w-full h-1/2 flex flex-col items-center'>
+    <p className='text-gray-400 text-lg'>Add Project</p>
+    </div>
+    </div>
+  </div>
+</div>
   <div className='w-full h-[200px] flex items-center justify-center'>
   <h1 className='text-5xl font-bold text-white'>Meet The Creator</h1>
   </div>
