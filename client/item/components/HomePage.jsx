@@ -26,36 +26,58 @@ const HomePage = () => {
 
 <div className='w-full bg-gray-900 p-4 m-4 flex flex-col items-center'>
   <div className='flex justify-center items-center'>
-    <h1 className='text-white text-5xl font-bold p-4 m-4'>How to Use</h1>
+    <h1 className='text-white text-5xl font-bold p-4 m-4'>Key Features</h1>
   </div>
 
-  <div className='w-full flex flex-row items-center p-4 m-4 space-x-2'>
-    <div className='w-[400px] h-[275px] bg-gray-800 flex flex-col items-center border border-gray-400 rounded-lg'>
-      <div className='w-full h-1/2 flex justify-center items-center'>
-        <img src={image7} alt="" className='w-[50px]' />
+  <div className='w-full flex flex-row items-center p-4 m-4 space-x-4'>
+    {/* Card 1 - Create tasks */}
+    <div className='w-[400px] h-[300px] bg-gray-900 flex flex-col items-center border border-gray-600 rounded-xl 
+                    shadow-md transition-all duration-300 ease-in-out 
+                    hover:scale-105 hover:border-gray-400 hover:shadow-lg hover:bg-white group'>
+      <div className='w-full h-2/5 flex justify-center items-center p-2'>
+        <img src={image7} alt="" className='w-[80px] transition-transform duration-300 hover:scale-110' />
       </div>
-      <div className='w-full h-1/2 flex flex-col items-center'>
-    <p className='text-gray-400 text-lg'>Register Your account</p>
-    </div>
-    </div>
-    <div className='w-[400px] h-[275px] bg-gray-800 flex flex-col items-center border border-gray-400 rounded-lg'>
-      <div className='w-full h-1/2 flex justify-center items-center'>
-        <img src={image8} alt="" className='w-[50px]' />
+      <div className='w-full h-3/5 flex flex-col items-center p-6'>
+        <h2 className='text-white text-2xl font-semibold group-hover:text-black transition-colors duration-300'>Create tasks</h2>
+        <p className='text-gray-400 text-lg text-center leading-relaxed group-hover:text-black transition-colors duration-300'>
+          Save your Daily Activity and analyze your daily progress
+        </p>
       </div>
-      <div className='w-full h-1/2 flex flex-col items-center'>
-    <p className='text-gray-400 text-lg'>Add Task</p>
     </div>
-    </div>
-    <div className='w-[400px] h-[275px] bg-gray-800 flex flex-col items-center border border-gray-400 rounded-lg'>
-      <div className='w-full h-1/2 flex justify-center items-center'>
-        <img src={image9} alt="" className='w-[50px]' />
+
+    {/* Card 2 - Collaborate */}
+    <div className='w-[400px] h-[300px] bg-gray-900 flex flex-col items-center border border-gray-600 rounded-xl 
+                    shadow-md transition-all duration-300 ease-in-out 
+                    hover:scale-105 hover:border-gray-400 hover:shadow-lg hover:bg-white group'>
+      <div className='w-full h-2/5 flex justify-center items-center p-2'>
+        <img src={image8} alt="" className='w-[80px] transition-transform duration-300 hover:scale-110' />
       </div>
-      <div className='w-full h-1/2 flex flex-col items-center'>
-    <p className='text-gray-400 text-lg'>Add Project</p>
+      <div className='w-full h-3/5 flex flex-col items-center p-6'>
+        <h2 className='text-white text-2xl font-semibold group-hover:text-black transition-colors duration-300'>Collaborate</h2>
+        <p className='text-gray-400 text-lg text-center leading-relaxed group-hover:text-black transition-colors duration-300'>
+          Collaboration with other users and update progress of other user's tasks
+        </p>
+      </div>
     </div>
+
+    {/* Card 3 - Reminders */}
+    <div className='w-[400px] h-[300px] bg-gray-900 flex flex-col items-center border border-gray-600 rounded-xl 
+                    shadow-md transition-all duration-300 ease-in-out 
+                    hover:scale-105 hover:border-gray-400 hover:shadow-lg hover:bg-white group'>
+      <div className='w-full h-2/5 flex justify-center items-center p-2'>
+        <img src={image9} alt="" className='w-[80px] transition-transform duration-300 hover:scale-110' />
+      </div>
+      <div className='w-full h-3/5 flex flex-col items-center p-6'>
+        <h2 className='text-white text-2xl font-semibold group-hover:text-black transition-colors duration-300'>Reminders</h2>
+        <p className='text-gray-400 text-lg text-center leading-relaxed group-hover:text-black transition-colors duration-300'>
+          Get reminders with deadlines assigned to each task and project
+        </p>
+      </div>
     </div>
   </div>
 </div>
+
+
   <div className='w-full h-[200px] flex items-center justify-center'>
   <h1 className='text-5xl font-bold text-white'>Meet The Creator</h1>
   </div>
@@ -76,12 +98,6 @@ const HomePage = () => {
   <div className='flex justify-center items-center'>
 <h2 className='text-5xl font-bold p-4 m-4'>Find us at this location</h2>
 </div>
-  <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224345.83937457612!2d77.06889901730158!3d28.527582007475844!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03bc9a1b5c41%3A0x29589a0e67ff54b2!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1618372206398!5m2!1sen!2sin"
-        style={{ width: "78%", height: "400px", border: "0" }}
-        allowFullScreen
-        loading="lazy"
-      ></iframe>
   </div>
 </div>
 </>
