@@ -22,7 +22,7 @@ const HomePage = () => {
   </div>
 </div>
 
-<div className='w-full h-full bg-black p-4 mb-4'>
+<div className='w-full h-full bg-gray-900 p-4 mb-4'>
 
 <div className='w-full bg-gray-900 p-4 m-4 flex flex-col items-center'>
   <div className='flex justify-center items-center'>
@@ -93,13 +93,8 @@ const HomePage = () => {
     </div>
 
   </div>
-  <Footer />
-  <div className='bg-black text-white flex flex-col items-center p-4 m-4'>
-  <div className='flex justify-center items-center'>
-<h2 className='text-5xl font-bold p-4 m-4'>Find us at this location</h2>
 </div>
-  </div>
-</div>
+<Footer />
 </>
   )
 }

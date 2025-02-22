@@ -69,6 +69,7 @@ function NewProject() {
     const [error, setError] = useState(null);
     const [analyticsData, setAnalyticsData] = useState([]);
     const [analyticsError, setAnalyticsError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         socket.on('projectUpdated', (updatedProject) => {
@@ -146,7 +147,6 @@ function NewProject() {
         navigate(`/notes/${projectId}`);
     };
     
-
     const updateProjectStatus = async (projectId, status, progress) => {
         try {
             const response = await fetch(`http://localhost:5000/projects/${projectId}`, {
@@ -176,7 +176,10 @@ function NewProject() {
             setError(err.message || 'Failed to update project');
         }
     };
-    
+
+    const filteredProjects = projects.filter(project =>
+        project.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const ProjectCard = ({ project }) => (
         <div className="w-full md:w-[500px] h-auto border border-gray-700 rounded-xl shadow-lg overflow-hidden bg-gray-800 hover:shadow-xl transition-shadow duration-300">
@@ -259,7 +262,16 @@ function NewProject() {
             <div className="min-h-screen bg-gray-900 text-white">
                 <div className="container mx-auto p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-3xl font-bold">Project Dashboard</h1>
+                        <div className="flex items-center gap-6">
+                            <h1 className="text-3xl font-bold">Project Dashboard</h1>
+                            <input
+                                type="text"
+                                placeholder="Search projects..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
                         <div className="text-sm mt-2 text-gray-400">
                             Status: {connected ? <span className="text-green-500">Connected</span> : <span className="text-red-500">Disconnected</span>}
                         </div>
@@ -269,7 +281,7 @@ function NewProject() {
                     <AnalyticsChart analyticsData={analyticsData} error={analyticsError} />
                     
                     <div className="w-full flex flex-wrap gap-6 justify-center">
-                        {projects.length > 0 ? projects.map((project) => (
+                        {filteredProjects.length > 0 ? filteredProjects.map((project) => (
                             <ProjectCard key={project._id} project={project} />
                         )) : (
                             <p className="text-gray-400">No projects available.</p>
