@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import Navbar from './Navbar';
 import { Link } from 'react-router';
+import Footer from './Footer';
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -102,6 +103,7 @@ const SignUp = () => {
                 </div>
             </form>
         </div>
+        <Footer />
         </>
     );
 };

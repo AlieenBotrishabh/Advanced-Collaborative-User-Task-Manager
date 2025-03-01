@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
+import Navbar from './Navbar';
 
 function Note() {
     const { projectId } = useParams();
@@ -66,6 +67,8 @@ function Note() {
     if (loading) return <div className="p-6 text-center text-gray-400">Loading notes...</div>;
 
     return (
+        <>
+        <Navbar />
         <div className="min-h-screen bg-gray-900 text-white p-6">
             <div className="max-w-3xl mx-auto">
                 <div className="flex items-center gap-4 mb-6">
@@ -118,6 +121,7 @@ function Note() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 

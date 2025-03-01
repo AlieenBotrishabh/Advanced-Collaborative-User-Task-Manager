@@ -45,7 +45,7 @@ app.use(cors({
 
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5175',
+        origin: 'http://localhost:5173',
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         credentials: true,
         allowedHeaders: ['Content-Type']
@@ -349,6 +349,58 @@ app.delete('/projects/:id', async (req, res) => {
 
         await ProjectDB.findByIdAndDelete(req.params.id);
         res.json({ message: 'Project deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+const projectNotes = {};
+
+app.get('/projects/:id/notes', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const notes = projectNotes[id] || []; // Return notes if they exist
+        res.json(notes);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Add a new note to a project
+app.post('/projects/:id/notes', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { content } = req.body;
+
+        if (!projectNotes[id]) {
+            projectNotes[id] = []; // Initialize notes array for this project
+        }
+
+        const newNote = {
+            id: Date.now().toString(), // Generate a unique ID
+            content,
+            createdAt: new Date(),
+        };
+
+        projectNotes[id].push(newNote);
+
+        res.status(201).json(newNote);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+app.delete('/projects/:id/notes/:noteId', async (req, res) => {
+    try {
+        const { id, noteId } = req.params;
+
+        if (!projectNotes[id]) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
+        projectNotes[id] = projectNotes[id].filter(note => note.id !== noteId);
+        
+        res.json({ message: 'Note deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

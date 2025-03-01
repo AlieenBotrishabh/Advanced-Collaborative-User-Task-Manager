@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
+import Footer from './Footer';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -109,6 +110,7 @@ const LoginPage = () => {
                 </div>
             </form>
         </div>
+        <Footer />
         </>
     );
 };

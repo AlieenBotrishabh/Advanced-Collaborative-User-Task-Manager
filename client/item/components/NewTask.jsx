@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { AlertTriangle, Clock } from 'lucide-react';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 const socket = io('http://localhost:5000');
 
@@ -170,6 +172,8 @@ function NewTask() {
     if (error) return <div className="p-6 text-center text-red-500">Error: {error}</div>;
 
     return (
+        <>
+        <Navbar />
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
@@ -263,6 +267,8 @@ function NewTask() {
                 )}
             </div>
         </div>
+        <Footer />
+        </>
     );
 }
 

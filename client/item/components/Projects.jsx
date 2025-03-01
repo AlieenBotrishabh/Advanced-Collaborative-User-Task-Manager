@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import image3 from '../assets/A3.gif';
 import { Plus, X } from 'lucide-react';
+import Footer from './Footer';
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -155,6 +156,7 @@ const Projects = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };
