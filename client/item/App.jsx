@@ -7,6 +7,7 @@ import Projects from './components/Projects';
 import Calender from './components/Calender';
 import NewProject from './components/NewProject';
 import Note from './components/Note';
+import TeamDashboard from './components/Team';
 
 const App = () => {
     const router = createBrowserRouter([
@@ -41,6 +42,10 @@ const App = () => {
         {
           path : '/notes/:projectId',
           element : <Note />
+        },
+        {
+          path: '/team',
+          element: <TeamDashboard />
         }
     ])
   return (
