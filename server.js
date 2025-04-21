@@ -18,6 +18,8 @@ const PORT = process.env.PORT || 5000;
 
 const authRoutes = require('./routes/authroutes');
 
+const mysql = require('./mysqlConnection');
+
 const homeRoutes = require('./routes/homeroutes');
 
 //a
@@ -185,24 +187,21 @@ app.get('/tasks', async(req, res) => {
 });
 
 // POST /tasks
-app.post('/tasks', async(req, res) => {
+app.post('/tasks', async (req, res) => {
+    const { task, description, priority, deadline, status, progress } = req.body;
     try {
-        const { task, description, priority, deadline, status, progress } = req.body;
-        const newTask = await Model.create({
-            task,
-            description,
-            priority,
-            deadline,
-            status: status || 'pending',
-            progress: progress || 0
+        const [result] = await mysql.query(
+            'INSERT INTO tasks (task, description, priority, deadline, status, progress) VALUES (?, ?, ?, ?, ?, ?)',
+            [task, description, priority, deadline, status, progress]
+        );
+        res.status(201).json({
+            msg: 'Task added successfully',
+            taskId: result.insertId,
         });
-
-        res.status(200).json(newTask); // Send task directly
-    }
-    catch(err) {
-        res.status(400).json({
-            msg: 'Task not created',
-            error: err.message
+    } catch (err) {
+        res.status(500).json({
+            msg: 'An error occurred while adding task',
+            error: err.message,
         });
     }
 });
