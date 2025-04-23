@@ -4,10 +4,11 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import SignUp from './components/SignUp';
 import Projects from './components/Projects';
-import Calender from './components/Calender';
 import NewProject from './components/NewProject';
 import Note from './components/Note';
 import TeamDashboard from './components/Team';
+import Reminder from './components/Reminder';
+import Users from './components/Users';
 
 const App = () => {
     const router = createBrowserRouter([
@@ -32,10 +33,6 @@ const App = () => {
           element : <Projects />
         },
         {
-          path : '/calender',
-          element : <Calender />
-        },
-        {
           path : '/newproject',
           element : <NewProject />
         },
@@ -46,6 +43,14 @@ const App = () => {
         {
           path: '/team',
           element: <TeamDashboard />
+        },
+        {
+          path: '/reminder',
+          element: <Reminder />
+        },
+        {
+          path: '/users',
+          element: <Users />
         }
     ])
   return (

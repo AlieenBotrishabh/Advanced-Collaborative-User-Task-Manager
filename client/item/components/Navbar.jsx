@@ -21,8 +21,9 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <Link to="/task" className="text-black hover:text-black hover:border-b-2 hover:border-indigo-500 pb-1">Task</Link>
+                <Link to="/reminder" className="text-black hover:text-black hover:border-b-2 hover:border-indigo-500 pb-1">Reminder</Link>
+                <Link to="/users" className="text-black hover:text-black hover:border-b-2 hover:border-indigo-500 pb-1">Users</Link>
                 <Link to="/project" className="text-black hover:text-black hover:border-b-2 hover:border-indigo-500 pb-1">Projects</Link>
-                <Link to="/calender" className="text-black hover:text-black hover:border-b-2 hover:border-indigo-500 pb-1">Calender</Link>
                 <Link to="/newproject" className="text-black hover:text-black hover:border-b-2 hover:border-indigo-500 pb-1">All Projects</Link>
               </div>
             </div>
