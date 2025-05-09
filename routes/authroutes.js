@@ -1,14 +1,15 @@
 const express = require('express');
-const { registerUser, loginUser } = require('../controller/authcontroller');
 const router = express.Router();
+const { registerUser, loginUser, getCurrentUser, getActiveUsers, logoutUser } = require('../controller/authcontroller');
 const authMiddleware = require('../middlewares/authmiddleware');
-const { getCurrentUser } = require('../controller/authcontroller'); 
 
+// Existing routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/me', authMiddleware, getCurrentUser);
-router.post('/active', authMiddleware, (req, res) => {
-    res.status(200).json({ success: true });
-});
+
+// New routes
+router.get('/active-users', authMiddleware, getActiveUsers);
+router.post('/logout', authMiddleware, logoutUser);
 
 module.exports = router;

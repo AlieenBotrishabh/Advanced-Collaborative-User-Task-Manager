@@ -6,6 +6,9 @@ const User = require('../model/model');
 // Make sure to set this in your .env file
 const JWT_SECRET = process.env.JWT_SECRET_KEY || 'your-fallback-secret-key';
 
+// Store active users in memory (in production you might want to use Redis)
+let activeUsers = new Map();
+
 const registerUser = async (req, res) => {
     const { empid, name, email, password } = req.body;
 
@@ -30,7 +33,8 @@ const registerUser = async (req, res) => {
             empid,
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            lastActive: new Date()
         });
 
         await newlyCreatedUser.save();
@@ -58,7 +62,7 @@ const registerUser = async (req, res) => {
             msg: 'An error occurred during registration'
         });
     }
-}; // Assuming you're using a User model
+};
 
 const loginUser = async (req, res) => {
   try {
@@ -76,8 +80,32 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
+    // Update last active time
+    user.lastActive = new Date();
+    await user.save();
+
     // Create a JWT token
-    const token = jwt.sign({ empid: user.empid, name: user.name, email: user.email }, 'secretKey', { expiresIn: '1h' });
+    const token = jwt.sign(
+      { 
+        userId: user._id,
+        empid: user.empid, 
+        name: user.name, 
+        email: user.email 
+      }, 
+      JWT_SECRET, 
+      { expiresIn: '1h' }
+    );
+
+    // Add user to active users
+    activeUsers.set(user._id.toString(), {
+      _id: user._id,
+      empid: user.empid,
+      name: user.name,
+      email: user.email,
+      role: user.role || 'Employee',
+      lastActive: new Date(),
+      loginTimestamp: new Date()
+    });
 
     // Send response with the token
     res.status(200).json({ accessToken: token });
@@ -87,17 +115,13 @@ const loginUser = async (req, res) => {
   }
 };
 
-
-// === authController.js ===
-// Add this to your existing auth controller
-
 // Get current user information
 const getCurrentUser = async (req, res) => {
     try {
         // req.user should be available from your auth middleware
-        const userId = req.user.id;
+        const userId = req.user.userId;
         
-        // Find user in database (using your existing Task model)
+        // Find user in database
         const user = await Task.findById(userId).select('-password');
         
         if (!user) {
@@ -107,21 +131,35 @@ const getCurrentUser = async (req, res) => {
             });
         }
         
-        // Get last active time
-        const lastActive = new Date();
-        
-        // Update last active time in DB
-        user.lastActive = lastActive;
+        // Update last active time in DB and active users map
+        user.lastActive = new Date();
         await user.save();
+        
+        if (activeUsers.has(userId.toString())) {
+            const activeUser = activeUsers.get(userId.toString());
+            activeUser.lastActive = new Date();
+        } else {
+            // Add to active users if not already there
+            activeUsers.set(userId.toString(), {
+                _id: user._id,
+                empid: user.empid,
+                name: user.name,
+                email: user.email,
+                role: user.role || 'Employee',
+                lastActive: new Date(),
+                loginTimestamp: new Date()
+            });
+        }
         
         // Return user data
         res.status(200).json({
             success: true,
+            _id: user._id,
             empid: user.empid,
             name: user.name,
             email: user.email,
             role: user.role || 'Employee',
-            lastActive: lastActive
+            lastActive: new Date()
         });
     } catch (err) {
         console.error('Error fetching current user:', err);
@@ -132,4 +170,61 @@ const getCurrentUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, getCurrentUser };
+// Get all active users
+const getActiveUsers = async (req, res) => {
+    try {
+        // Clean up inactive users (inactive for more than 1 hour)
+        const now = new Date();
+        for (const [userId, userData] of activeUsers.entries()) {
+            const lastActiveTime = new Date(userData.lastActive);
+            const diffMs = now - lastActiveTime;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins > 60) {
+                activeUsers.delete(userId);
+            }
+        }
+        
+        // Convert Map to Array for response
+        const activeUsersArray = Array.from(activeUsers.values());
+        
+        res.status(200).json(activeUsersArray);
+    } catch (err) {
+        console.error('Error fetching active users:', err);
+        res.status(500).json({
+            success: false,
+            msg: 'Server error when retrieving active users'
+        });
+    }
+};
+
+// Log out user
+const logoutUser = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        
+        // Remove from active users
+        if (activeUsers.has(userId.toString())) {
+            activeUsers.delete(userId.toString());
+        }
+        
+        res.status(200).json({
+            success: true,
+            msg: 'User logged out successfully'
+        });
+    } catch (err) {
+        console.error('Error logging out user:', err);
+        res.status(500).json({
+            success: false,
+            msg: 'Server error when logging out'
+        });
+    }
+};
+
+module.exports = { 
+    registerUser, 
+    loginUser, 
+    getCurrentUser,
+    getActiveUsers,
+    logoutUser
+};
