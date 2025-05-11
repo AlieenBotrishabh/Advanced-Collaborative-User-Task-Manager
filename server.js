@@ -1,43 +1,35 @@
 const express = require('express');
+const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
+const dotenv = require('dotenv');
+
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-
-const cors = require('cors')
-
-const http = require('http');
-
 const server = http.createServer(app);
 
+// Models
 const ProjectDB = require('./projects/project');
+const Task = require('./model/model'); // For employee model
+const TaskModel = require('./schema/task'); // For task management 
+const Team = require('./Team/team');
 
-const { Server } = require('socket.io');
+// Routes
+const authRoutes = require('./routes/authroutes');
+const homeRoutes = require('./routes/homeroutes');
+const adminRoutes = require('./routes/adminroutes');
 
-require('dotenv').config();
+// MySQL and MongoDB connections
+const mysql = require('./mysqlConnection');
+const connectDB = require('./database/database');
+const connectDB2 = require('./database/database2');
+const connectDB3 = require('./database/database3');
 
 const PORT = process.env.PORT || 5000;
 
-const authRoutes = require('./routes/authroutes');
-
-const mysql = require('./mysqlConnection');
-
-const homeRoutes = require('./routes/homeroutes');
-
-//a
-
-const adminRoutes = require('./routes/adminroutes');
-
-const connectDB = require('./database/database');
-
-const connectDB2 = require('./database/database2');
-
-const connectDB3 = require('./database/database3');
-
-const Task = require('./model/model');
-
-const Model = require('./schema/task');
-
+// Middleware
 app.use(express.json());
-
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true,
@@ -45,192 +37,129 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+// WebSocket setup - FIXED CONFIGURATION
 const io = new Server(server, {
     cors: {
         origin: 'http://localhost:5173',
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         credentials: true,
-        allowedHeaders: ['Content-Type']
     },
-    allowEIO3: true // Enable compatibility mode
+    transports: ['websocket', 'polling'], // Explicitly define transports
+    allowEIO3: true, // Enable compatibility mode
+    path: '/socket.io/' // Make sure path matches client configuration
 });
 
+// Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/admin', adminRoutes);
 
-const tasks = [];
-
+// Socket.IO Event Handling
 io.on('connection', (socket) => {
-    console.log('A user connected', socket.id);
+    console.log('A user connected:', socket.id);
 
     socket.on('createTask', (task) => {
-        console.log('New Task Created', task);
+        // Emit to all clients except sender
         socket.broadcast.emit('newTask', task);
-    })
+        console.log('New task created:', task.task);
+    });
+
+    socket.on('updateTask', (task) => {
+        // Emit to all clients except sender
+        socket.broadcast.emit('taskUpdated', task);
+        console.log('Task updated:', task._id);
+    });
 
     socket.on('disconnect', () => {
-        console.log('A user disconencted', socket.id);
-    })
-})
-
-app.get('/', async(req, res) => {
-
-    try
-    {
-        res.status(200).json({
-        msg : 'Server is on the Home Page',
-    })
-    }
-    catch(err)
-    {
-        res.status(400).json({
-            msg : `An error ocurred ${err}`
-        })
-        console.log(`An error ocurred ${err}`);
-    }
-})
-
-app.get('/user', async(req, res) => {
-    try
-    {
-        const user = await Task.find();
-        console.log(user);
-
-        res.status(200).json({
-            msg : 'Employee Found',
-            success : true,
-            user
-        })
-    }
-    catch(err)
-    {
-        console.log(`An error ocurred ${err}`);
-    }
-})
-
-app.post('/add', async(req, res) => {
-    try
-    {
-        const { empid, name, email, password } = req.body;
-        const user = await Task.create({
-            empid : empid,
-            name : name,
-            email : email,
-            password : password
-        })
-
-        res.status(200).json({
-            msg : 'Employee Added',
-            success : true,
-            user
-        })
-    }
-    catch(err)
-    {
-        res.status(400).json({
-            msg : `An error ocurred ${err}`
-        })
-
-        console.log(`An error ocurred ${err}`);
-    }
-})
-
-app.put('/user/:id', async(req, res) => {
-    try
-    {
-        const { id } = req.params;
-
-        const { name, email, password } = req.body;
-
-        const user = await Task.findByIdAndUpdate(
-            id,
-            { name, email, password },
-            { new : true, runValidators: true}
-        );
-
-        if(!user)
-        {
-            res.status(404).json({
-                msg : 'User not found'
-            })
-        }
-
-        res.status(200).json({
-            msg : 'Employee found',
-            success : true,
-            user
-        })
-    }
-    catch(err)
-    {
-        res.status(400).json({
-            msg : `An error ocurred ${err}`
-        })
-
-        console.log(`An error ocurred ${err}`);
-    }
-})
-
-// GET /tasks
-app.get('/tasks', async(req, res) => {
-    try {
-        const tasks = await Model.find({});
-        res.status(200).json(tasks); // Send array directly
-    }
-    catch(err) {
-        res.status(400).json({
-            msg: 'Tasks not found',
-            error: err.message
-        });
-    }
+        console.log('User disconnected:', socket.id);
+    });
 });
 
-// POST /tasks
-app.post('/tasks', async (req, res) => {
-    const { task, description, priority, deadline, status, progress } = req.body;
+// Routes
+app.get('/', async (req, res) => {
     try {
-        const [result] = await mysql.query(
-            'INSERT INTO tasks (task, description, priority, deadline, status, progress) VALUES (?, ?, ?, ?, ?, ?)',
-            [task, description, priority, deadline, status, progress]
-        );
-        res.status(201).json({
-            msg: 'Task added successfully',
-            taskId: result.insertId,
+        res.status(200).json({
+            msg: 'Server is on the Home Page',
         });
     } catch (err) {
-        res.status(500).json({
-            msg: 'An error occurred while adding task',
-            error: err.message,
-        });
-    }
-});
-
-// Add PATCH endpoint for updating status
-app.patch('/tasks/:id', async(req, res) => {
-    try {
-        const { id } = req.params;
-        const { status, progress } = req.body;
-        
-        const updatedTask = await Model.findByIdAndUpdate(
-            id,
-            { status, progress },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedTask) {
-            return res.status(404).json({ msg: 'Task not found' });
-        }
-
-        res.status(200).json(updatedTask);
-    } catch(err) {
         res.status(400).json({
-            msg: 'Failed to update task',
-            error: err.message
+            msg: `An error occurred: ${err}`,
         });
+        console.log(`An error occurred: ${err}`);
     }
 });
 
+// Employee Routes
+app.get('/user', async (req, res) => {
+    try {
+        const users = await Task.find();
+        res.status(200).json({
+            msg: 'Employees Found',
+            success: true,
+            users,
+        });
+    } catch (err) {
+        console.log(`An error occurred: ${err}`);
+    }
+});
+
+app.post('/add', async (req, res) => {
+    try {
+        const { empid, name, email, password } = req.body;
+        const user = await Task.create({ empid, name, email, password });
+        res.status(200).json({
+            msg: 'Employee Added',
+            success: true,
+            user,
+        });
+    } catch (err) {
+        res.status(400).json({
+            msg: `An error occurred: ${err}`,
+        });
+        console.log(`An error occurred: ${err}`);
+    }
+});
+
+// Team Routes
+app.get('/teams', async (req, res) => {
+    try {
+        // If teamId is provided, return just that team
+        if (req.query.teamId) {
+            const team = await Team.findById(req.query.teamId);
+            if (!team) {
+                return res.status(404).json({ message: 'Team not found' });
+            }
+            return res.json(team);
+        }
+        // Otherwise return all teams
+        const teams = await Team.find().sort({ createdAt: -1 });
+        res.json(teams);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.post('/teams', async (req, res) => {
+    try {
+        const team = new Team({
+            name: req.body.name,
+            members: req.body.members || [],
+            description: req.body.description,
+            createdAt: new Date()
+        });
+        
+        const newTeam = await team.save();
+        res.status(201).json({
+            message: 'Team created successfully',
+            team: newTeam
+        });
+    } catch (err) {
+        console.error('Team creation error:', err);
+        res.status(400).json({ message: 'Failed to create team', error: err.message });
+    }
+});
+
+// Project Routes
 app.get('/projects', async (req, res) => {
     try {
         const projects = await ProjectDB.find().sort({ createdAt: -1 });
@@ -240,7 +169,6 @@ app.get('/projects', async (req, res) => {
     }
 });
 
-// Create new project
 app.post('/projects', async (req, res) => {
     const project = new ProjectDB({
         name: req.body.name,
@@ -256,24 +184,21 @@ app.post('/projects', async (req, res) => {
     try {
         const newProject = await project.save();
         res.status(201).json({
-            msg : 'Project added successfully',
-            newProject
+            msg: 'Project added successfully',
+            newProject,
         });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
 });
 
-// Update project
+// Update project route
 app.patch('/projects/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { status, progress } = req.body;
-        
         if (!status || progress === undefined) {
-            return res.status(400).json({ 
-                message: 'Status and progress are required fields' 
-            });
+            return res.status(400).json({ message: 'Status and progress are required fields' });
         }
 
         const project = await ProjectDB.findById(id);
@@ -286,47 +211,98 @@ app.patch('/projects/:id', async (req, res) => {
             timestamp: new Date(),
             type: 'status_change',
             newStatus: status,
-            newProgress: progress
+            newProgress: progress,
         });
 
         project.status = status;
         project.progress = progress;
 
         const updatedProject = await project.save();
-        
+
         io.emit('projectUpdated', updatedProject);
-        
+
         res.json(updatedProject);
     } catch (err) {
         console.error('Project update error:', err);
-        res.status(400).json({ 
-            message: 'Failed to update project',
-            error: err.message 
-        });
+        res.status(400).json({ message: 'Failed to update project', error: err.message });
     }
 });
 
+// Task Routes
+app.get('/tasks', async (req, res) => {
+    try {
+        const filter = {};
+        
+        // Filter by teamId if provided
+        if (req.query.teamId) {
+            filter.teamId = req.query.teamId;
+        }
+        
+        const tasks = await TaskModel.find(filter).sort({ createdAt: -1 });
+        res.json(tasks);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
-// Get project analytics
+app.post('/tasks', async (req, res) => {
+    try {
+        const task = new TaskModel(req.body);
+        const newTask = await task.save();
+        
+        // Emit socket event for real-time updates
+        io.emit('newTask', newTask);
+        
+        res.status(201).json(newTask);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+app.patch('/tasks/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        
+        const task = await TaskModel.findById(id);
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+        
+        // Update the task
+        Object.keys(updates).forEach(key => {
+            task[key] = updates[key];
+        });
+        
+        const updatedTask = await task.save();
+        
+        // Emit socket event for real-time updates
+        io.emit('taskUpdated', updatedTask);
+        
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// Project analytics route
 app.get('/projects/analytics', async (req, res) => {
     try {
         const projects = await ProjectDB.find();
-        
-        // Create analytics data for the last 7 days
+
         const analytics = Array.from({ length: 7 }, (_, i) => {
             const date = new Date();
             date.setDate(date.getDate() - i);
             return {
                 date: date.toISOString().split('T')[0],
-                updates: 0
+                updates: 0,
             };
         }).reverse();
 
-        // Count updates for each day
-        projects.forEach(project => {
-            project.updates.forEach(update => {
+        projects.forEach((project) => {
+            project.updates.forEach((update) => {
                 const updateDate = new Date(update.timestamp).toISOString().split('T')[0];
-                const analyticsEntry = analytics.find(a => a.date === updateDate);
+                const analyticsEntry = analytics.find((a) => a.date === updateDate);
                 if (analyticsEntry) {
                     analyticsEntry.updates++;
                 }
@@ -339,84 +315,12 @@ app.get('/projects/analytics', async (req, res) => {
     }
 });
 
-app.delete('/projects/:id', async (req, res) => {
-    try {
-        const project = await ProjectDB.findById(req.params.id);
-        if (!project) {
-            return res.status(404).json({ message: 'Project not found' });
-        }
-
-        await ProjectDB.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Project deleted successfully' });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-const projectNotes = {};
-
-app.get('/projects/:id/notes', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const notes = projectNotes[id] || []; // Return notes if they exist
-        res.json(notes);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Add a new note to a project
-app.post('/projects/:id/notes', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { content } = req.body;
-
-        if (!projectNotes[id]) {
-            projectNotes[id] = []; // Initialize notes array for this project
-        }
-
-        const newNote = {
-            id: Date.now().toString(), // Generate a unique ID
-            content,
-            createdAt: new Date(),
-        };
-
-        projectNotes[id].push(newNote);
-
-        res.status(201).json(newNote);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-app.delete('/projects/:id/notes/:noteId', async (req, res) => {
-    try {
-        const { id, noteId } = req.params;
-
-        if (!projectNotes[id]) {
-            return res.status(404).json({ message: 'Project not found' });
-        }
-
-        projectNotes[id] = projectNotes[id].filter(note => note.id !== noteId);
-        
-        res.json({ message: 'Note deleted successfully' });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-
+// Database Connections
 connectDB();
-
 connectDB2();
-
 connectDB3();
 
-// app.listen(PORT, () => {
-//     console.log(`Server is listening on the port ${PORT}`);
-// })
-
+// Start server
 server.listen(PORT, () => {
-    console.log(`Server is listening on the port ${PORT}`);
-})
-
+    console.log(`Server is listening on port ${PORT}`);
+});

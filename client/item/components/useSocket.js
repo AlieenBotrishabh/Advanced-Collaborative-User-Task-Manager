@@ -1,22 +1,25 @@
-import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+// Replace your current socket.io client connection with this
 
-const socket = io("http://localhost:5000");
+import { io } from 'socket.io-client';
 
-export const useSocket = (projectId) => {
-  const [project, setProject] = useState(null);
+const socket = io('http://localhost:5000', {
+  transports: ['websocket', 'polling'], // Try WebSocket first, fallback to polling
+  withCredentials: true,
+  path: '/socket.io/', // Must match server path
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000
+});
 
-  useEffect(() => {
-    socket.emit("joinProject", projectId);
+socket.on('connect', () => {
+  console.log('Connected to server with ID:', socket.id);
+});
 
-    socket.on("projectUpdated", (data) => {
-      if (data.projectId === projectId) {
-        setProject((prev) => ({ ...prev, ...data.updates }));
-      }
-    });
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error);
+});
 
-    return () => socket.disconnect();
-  }, [projectId]);
+socket.on('disconnect', (reason) => {
+  console.log('Disconnected:', reason);
+});
 
-  return { project, socket };
-};
+export default socket;

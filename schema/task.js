@@ -5,6 +5,10 @@ const schema = new mongoose.Schema({
         type: String,
         required: true
     },
+    teamId: {
+        type: String,
+        required: true
+    },
     description: {
         type: String,
         required: true
@@ -29,5 +33,8 @@ const schema = new mongoose.Schema({
         max: 100
     }
 });
+
+// Enforce unique task names per team
+schema.index({ task: 1, teamId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Taskdb', schema);
