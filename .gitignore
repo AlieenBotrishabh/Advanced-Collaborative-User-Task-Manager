@@ -1,1 +1,16 @@
+# Ignore environment files
 .env
+.env.local
+
+# Node modules (for Node.js projects)
+node_modules/
+
+# Log files
+*.log
+
+# System files
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/
