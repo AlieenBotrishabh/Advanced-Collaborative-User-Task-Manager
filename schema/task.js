@@ -13,12 +13,17 @@ const schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    priority: {
-        type: Number,
-        required: true,
-    },
     deadline: {
         type: Date,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    priority: {
+        type: String,
+        enum: ['low', 'medium', 'high'],
         required: true
     },
     status: {
@@ -31,10 +36,14 @@ const schema = new mongoose.Schema({
         default: 0,
         min: 0,
         max: 100
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
-// Enforce unique task names per team
-schema.index({ task: 1, teamId: 1 }, { unique: true });
+// Remove the unique index to allow duplicate task names within the same team
+// schema.index({ task: 1, teamId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Taskdb', schema);

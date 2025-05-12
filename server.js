@@ -26,6 +26,8 @@ const connectDB = require('./database/database');
 const connectDB2 = require('./database/database2');
 const connectDB3 = require('./database/database3');
 
+const scheduleEmailReminder = require('./nodemailer');
+
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -249,6 +251,7 @@ app.post('/tasks', async (req, res) => {
     try {
         const task = new TaskModel(req.body);
         const newTask = await task.save();
+        scheduleEmailReminder(newTask);
         
         // Emit socket event for real-time updates
         io.emit('newTask', newTask);
@@ -258,6 +261,42 @@ app.post('/tasks', async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 });
+
+app.delete('/tasks/:id', async (req, res) => {
+    try {
+        const deletedTask = await TaskModel.findByIdAndDelete(req.params.id);
+        if (!deletedTask) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        // Emit socket event if needed
+        io.emit('deleteTask', req.params.id);
+
+        res.json({ message: 'Task deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.put('/tasks/:id', async (req, res) => {
+    try {
+        const updatedTask = await TaskModel.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+
+        if (!updatedTask) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        io.emit('updateTask', updatedTask);
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 
 app.patch('/tasks/:id', async (req, res) => {
     try {
