@@ -88,6 +88,19 @@ const SignUp = () => {
                         />
                     </div>
 
+                    <div>
+    <label className='text-lg font-medium text-gray-700' htmlFor="taskId">Task ID</label>
+    <input
+        className='w-full border-2 border-gray-300 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition duration-300'
+        type="text"
+        id="taskId"
+        name='taskId'
+        placeholder='Enter your Task ID'
+        required
+    />
+</div>
+
+
                     <div className='mt-6'>
                         <button
                             type="submit"

@@ -37,13 +37,15 @@ const schema = new mongoose.Schema({
         min: 0,
         max: 100
     },
+    taskAssigned: { // This field links the task to the employee
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task',  // Reference to the Task model (Employee)
+        required: false,
+    },
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
-
-// Remove the unique index to allow duplicate task names within the same team
-// schema.index({ task: 1, teamId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Taskdb', schema);

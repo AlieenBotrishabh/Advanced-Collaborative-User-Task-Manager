@@ -3,15 +3,13 @@ import HomePage from './components/HomePage';
 import NewTask from './components/NewTask';
 import LoginPage from './components/LoginPage';
 import SignUp from './components/SignUp';
-import Projects from './components/Projects';
-import NewProject from './components/NewProject';
-import Note from './components/Note';
 import TeamDashboard from './components/Team';
 import Reminder from './components/Reminder';
 import Users from './components/Users';
 import TeamsOverview from './components/TeamOverview';
 import Team from './components/Team';
 import { Navigate } from 'react-router-dom';
+import TaskCharts from './components/TaskCharts';
 
 const router = createBrowserRouter([
   {
@@ -29,18 +27,6 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <SignUp />,
-  },
-  {
-    path: '/project',
-    element: <Projects />,
-  },
-  {
-    path: '/newproject',
-    element: <NewProject />,
-  },
-  {
-    path: '/notes/:projectId',
-    element: <Note />,
   },
   {
     path: '/team',
@@ -70,6 +56,10 @@ const router = createBrowserRouter([
     path: '*',
     element: <Navigate to="/teams" replace />,
   },
+  {
+    path: '/taskcharts',
+    element: <TaskCharts />
+  }
 ]);
 
 const App = () => {

@@ -10,7 +10,6 @@ const app = express();
 const server = http.createServer(app);
 
 // Models
-const ProjectDB = require('./projects/project');
 const Task = require('./model/model'); // For employee model
 const TaskModel = require('./schema/task'); // For task management 
 const Team = require('./Team/team');
@@ -107,8 +106,8 @@ app.get('/user', async (req, res) => {
 
 app.post('/add', async (req, res) => {
     try {
-        const { empid, name, email, password } = req.body;
-        const user = await Task.create({ empid, name, email, password });
+        const { empid, name, email, password, taskId } = req.body;
+        const user = await Task.create({ empid, name, email, password, taskId });
         res.status(200).json({
             msg: 'Employee Added',
             success: true,
@@ -158,75 +157,6 @@ app.post('/teams', async (req, res) => {
     } catch (err) {
         console.error('Team creation error:', err);
         res.status(400).json({ message: 'Failed to create team', error: err.message });
-    }
-});
-
-// Project Routes
-app.get('/projects', async (req, res) => {
-    try {
-        const projects = await ProjectDB.find().sort({ createdAt: -1 });
-        res.json(projects);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-app.post('/projects', async (req, res) => {
-    const project = new ProjectDB({
-        name: req.body.name,
-        username: req.body.username,
-        language: req.body.language,
-        deadline: req.body.deadline,
-        description: req.body.description,
-        progress: 0,
-        status: 'pending',
-        updates: [],
-    });
-
-    try {
-        const newProject = await project.save();
-        res.status(201).json({
-            msg: 'Project added successfully',
-            newProject,
-        });
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// Update project route
-app.patch('/projects/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status, progress } = req.body;
-        if (!status || progress === undefined) {
-            return res.status(400).json({ message: 'Status and progress are required fields' });
-        }
-
-        const project = await ProjectDB.findById(id);
-        if (!project) {
-            return res.status(404).json({ message: 'Project not found' });
-        }
-
-        // Ensure updates are pushed as an object
-        project.updates.push({
-            timestamp: new Date(),
-            type: 'status_change',
-            newStatus: status,
-            newProgress: progress,
-        });
-
-        project.status = status;
-        project.progress = progress;
-
-        const updatedProject = await project.save();
-
-        io.emit('projectUpdated', updatedProject);
-
-        res.json(updatedProject);
-    } catch (err) {
-        console.error('Project update error:', err);
-        res.status(400).json({ message: 'Failed to update project', error: err.message });
     }
 });
 
@@ -324,32 +254,115 @@ app.patch('/tasks/:id', async (req, res) => {
     }
 });
 
-// Project analytics route
-app.get('/projects/analytics', async (req, res) => {
+app.get('/tasks/analytics', async (req, res) => {
     try {
-        const projects = await ProjectDB.find();
-
-        const analytics = Array.from({ length: 7 }, (_, i) => {
-            const date = new Date();
+        // Get teamId from query params (optional filter)
+        const teamId = req.query.teamId;
+        const filter = teamId ? { teamId } : {};
+        
+        // Get all tasks (filtered by team if provided)
+        const tasks = await TaskModel.find(filter);
+        
+        // Calculate status distribution
+        const statusCounts = {
+            'pending': 0,
+            'in-progress': 0,
+            'completed': 0
+        };
+        
+        tasks.forEach(task => {
+            statusCounts[task.status] = (statusCounts[task.status] || 0) + 1;
+        });
+        
+        const statusDistribution = Object.keys(statusCounts).map(status => ({
+            name: status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' '),
+            value: statusCounts[status],
+            color: status === 'pending' ? '#FFBB28' : 
+                   status === 'in-progress' ? '#0088FE' : '#00C49F'
+        }));
+        
+        // Calculate priority distribution
+        const priorityCounts = {
+            'low': 0,
+            'medium': 0,
+            'high': 0
+        };
+        
+        tasks.forEach(task => {
+            priorityCounts[task.priority] = (priorityCounts[task.priority] || 0) + 1;
+        });
+        
+        const priorityDistribution = Object.keys(priorityCounts).map(priority => ({
+            name: priority.charAt(0).toUpperCase() + priority.slice(1),
+            value: priorityCounts[priority],
+            fill: priority === 'high' ? '#ef4444' : 
+                  priority === 'medium' ? '#f59e0b' : '#22c55e'
+        }));
+        
+        // Calculate task activity for the last 7 days
+        const today = new Date();
+        const last7Days = Array.from({ length: 7 }, (_, i) => {
+            const date = new Date(today);
             date.setDate(date.getDate() - i);
             return {
                 date: date.toISOString().split('T')[0],
-                updates: 0,
+                created: 0,
+                completed: 0
             };
         }).reverse();
-
-        projects.forEach((project) => {
-            project.updates.forEach((update) => {
-                const updateDate = new Date(update.timestamp).toISOString().split('T')[0];
-                const analyticsEntry = analytics.find((a) => a.date === updateDate);
-                if (analyticsEntry) {
-                    analyticsEntry.updates++;
+        
+        // Calculate tasks created and completed by day
+        tasks.forEach(task => {
+            const createdDate = new Date(task.createdAt).toISOString().split('T')[0];
+            const createdEntry = last7Days.find(day => day.date === createdDate);
+            
+            if (createdEntry) {
+                createdEntry.created++;
+            }
+            
+            // For completed tasks, use the updatedAt field if available
+            // This is an approximation - ideally, you would track when a task status changes to 'completed'
+            if (task.status === 'completed') {
+                const completedDate = task.updatedAt ? 
+                    new Date(task.updatedAt).toISOString().split('T')[0] : 
+                    createdDate;
+                    
+                const completedEntry = last7Days.find(day => day.date === completedDate);
+                
+                if (completedEntry) {
+                    completedEntry.completed++;
                 }
-            });
+            }
         });
-
-        res.json(analytics);
+        
+        // Format dates for display
+        const taskActivity = last7Days.map(day => ({
+            ...day,
+            formattedDate: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        }));
+        
+        // Calculate summary stats
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(t => t.status === 'completed').length;
+        const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        const pendingTasks = tasks.filter(t => t.status === 'pending').length;
+        
+        // Return all analytics data
+        res.json({
+            statusDistribution,
+            priorityDistribution,
+            taskActivity,
+            summary: {
+                totalTasks,
+                completedTasks,
+                completionRate,
+                pendingTasks,
+                inProgressTasks: tasks.filter(t => t.status === 'in-progress').length
+            }
+        });
+        
     } catch (err) {
+        console.error("Error generating task analytics:", err);
         res.status(500).json({ message: err.message });
     }
 });

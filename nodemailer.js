@@ -17,7 +17,7 @@ const scheduleEmailReminder = (task) => {
 
   schedule.scheduleJob(reminderTime, async () => {
     await transporter.sendMail({
-      from: '"Task Reminder" <your_email@gmail.com>',
+      from: '"Task Reminder" rishabhk1324@gmail.com',
       to: task.email,
       subject: `Reminder: Task "${task.task}" is due soon`,
       text: `Hey there! Just a reminder that your task "${task.task}" is due by ${task.deadline}.`,

@@ -36,13 +36,12 @@ const Navbar = () => {
             
             {/* Nav Links - Hidden on mobile */}
             <div className="hidden md:flex space-x-1 text-gray-700 font-medium">
-              {['dashboard', 'task', 'reminder', 'project', 'allprojects', 'Teams'].map((link) => {
+              {['dashboard', 'task', 'reminder', 'TaskCharts', 'Teams'].map((link) => {
                 const paths = {
                   dashboard: '/',
                   task: '/task',
                   reminder: '/reminder',
-                  project: '/project',
-                  allprojects: '/newproject',
+                  TaskCharts: '/taskcharts',
                   Teams: '/Teams'
                 };
                 
@@ -50,8 +49,7 @@ const Navbar = () => {
                   dashboard: 'Dashboard',
                   task: 'Task',
                   reminder: 'Reminder',
-                  project: 'Projects',
-                  allprojects: 'All Projects',
+                  TaskCharts: 'Charts',
                   Teams: 'Teams'
                 };
                 

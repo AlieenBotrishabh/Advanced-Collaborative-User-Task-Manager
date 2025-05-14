@@ -26,8 +26,7 @@ const HomePage = () => {
               Simplify Your Life with Task Manager
             </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-600">Manage, Organize</span> & 
-              <span className="block mt-2">Prioritize Your Tasks</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-600">TogethrTask</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed">
               Stay productive with our intuitive task management system designed for individuals and Teams.
@@ -38,12 +37,6 @@ const HomePage = () => {
                 to="/register"
               >
                 Get Started Now
-              </Link>
-              <Link
-                className="bg-transparent border-2 border-gray-800 text-gray-800 px-10 py-4 rounded-full text-lg font-semibold hover:bg-gray-800 hover:text-white transition duration-300 w-full sm:w-auto"
-                to="/features"
-              >
-                Explore Features
               </Link>
             </div>
           </div>

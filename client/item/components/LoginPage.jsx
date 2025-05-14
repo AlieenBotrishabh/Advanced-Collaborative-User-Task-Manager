@@ -5,8 +5,12 @@ import Footer from './Footer';
 
 const LoginPage = () => {
     const navigate = useNavigate();
+
     const [empid, setEmpid] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [role, setRole] = useState('Employee');
+    const [taskId, setTaskId] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -19,7 +23,7 @@ const LoginPage = () => {
             const response = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ empid, password }),
+                body: JSON.stringify({ empid, password, email, role, taskId }),
             });
 
             const data = await response.json();
@@ -47,7 +51,7 @@ const LoginPage = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label htmlFor="empid" className="block mb-1 text-sm font-medium text-gray-700">Username</label>
+                            <label htmlFor="empid" className="block mb-1 text-sm font-medium text-gray-700">Employee ID</label>
                             <input
                                 id="empid"
                                 type="text"
@@ -55,7 +59,7 @@ const LoginPage = () => {
                                 onChange={(e) => setEmpid(e.target.value)}
                                 required
                                 disabled={isLoading}
-                                placeholder="Enter your username"
+                                placeholder="Enter your employee ID"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                             />
                         </div>
@@ -70,6 +74,19 @@ const LoginPage = () => {
                                 required
                                 disabled={isLoading}
                                 placeholder="Enter your password"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="taskId" className="block mb-1 text-sm font-medium text-gray-700">Task ID (optional)</label>
+                            <input
+                                id="taskId"
+                                type="text"
+                                value={taskId}
+                                onChange={(e) => setTaskId(e.target.value)}
+                                disabled={isLoading}
+                                placeholder="Enter task ID"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                             />
                         </div>
